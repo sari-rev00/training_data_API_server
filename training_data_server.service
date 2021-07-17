@@ -1,0 +1,21 @@
+[Unit]
+Description=traning_data_api_servevr
+After=syslog.target network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/App/test_calc_trainner_server/server.py
+Restart=always
+# Restart service after 10 seconds if node service crash
+RestartSec=10
+# Output to syslog
+StandardOutput=syslog
+# Output to syslog
+StandardError=syslog
+#SystemMaxUse=50M
+SyslogIdentifier=traning_data_api_servevr
+WorkingDirectory=/home/pi/App/test_calc_trainner_server/
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
