@@ -32,7 +32,12 @@ class App(FastAPI):
 
         @self.exception_handler(RequestValidationError)
         async def validation_exception_handler(request: Request, exc):
-            logger.error(exc.errors())
+#            print(dir(request))
+#            print(request.app)
+#            print(request.client)
+#            print(request.headers)
+#            print(request.method)
+#            print(request.url)
             return JSONResponse(
                 content={'msg': 'Invalid request.'},
                 status_code=status.HTTP_400_BAD_REQUEST
@@ -40,7 +45,7 @@ class App(FastAPI):
 
         @self.exception_handler(HTTPException)
         async def http_exception_handler(request: Request, exc):
-            logger.error(exc.detail)
+            print(request)
             return JSONResponse(
                 content={'msg': 'Internal server error.'},
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
