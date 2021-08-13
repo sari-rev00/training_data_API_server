@@ -2,6 +2,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, Optional
 import json
@@ -10,8 +11,15 @@ from db.tables import SessionManager
 
 sm = SessionManager()
 
+
+class Data(BaseModel):
+    code: str
+    score: Dict
+
+
 class SimpleResponse(BaseModel):
     Dict
+
 
 class App(FastAPI):
     def __init__(self):
@@ -25,10 +33,13 @@ class App(FastAPI):
             return JSONResponse(content={'msg': 'ok'}, status_code=status.HTTP_200_OK)
         
         @self.post('/upload', response_model=SimpleResponse)
-        def upload(request: Dict):
-            print(request)
-            sm.calc_insert(data=request)
-            return JSONResponse(content={'msg': 'ok'}, status_code=status.HTTP_200_OK)
+        def upload(request: Data):
+            print(request.score)
+            sm.calc_insert(data=request.score)
+            return JSONResponse(
+                content={'msg': 'ok'}, 
+                status_code=status.HTTP_200_OK
+            )
 
         @self.exception_handler(RequestValidationError)
         async def validation_exception_handler(request: Request, exc):
@@ -64,6 +75,14 @@ if __name__ == '__main__':
     try:
         app = None
         app=App()
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+#            allow_credentials=True,
+            allow_methods=["GET", "POST"],
+            allow_headers=["*"],
+        )
+
         uvicorn.run(
             app=app, 
             host=host, 
